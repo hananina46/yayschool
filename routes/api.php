@@ -4,6 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AcademicYearController;
+use App\Http\Controllers\SchoolClassController;
+use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\StudentController;
+
+
+
 
 
 /*
@@ -33,3 +39,22 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('academic-years', AcademicYearController::class);
 });
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('school-classes', SchoolClassController::class);
+});
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('teachers', TeacherController::class);
+    Route::post('teachers/{teacher}', [TeacherController::class, 'update']);
+    
+});
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('students', StudentController::class);
+    Route::post('students/{student}', [StudentController::class, 'update']);
+});
+
