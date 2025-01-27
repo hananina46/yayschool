@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-//validator
 use Illuminate\Support\Facades\Validator;
 
 class StudentController extends Controller
@@ -22,7 +21,9 @@ class StudentController extends Controller
         return response()->json($students);
     }
 
-    //show student by id
+    /**
+     * Show a specific student by ID.
+     */
     public function show($id)
     {
         $student = Student::where('tenant_id', auth()->user()->tenant_id)->with('class', 'user')->find($id);
@@ -39,7 +40,7 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:students,email|unique:users,email',
             'class_id' => 'nullable|exists:school_classes,id',
@@ -48,8 +49,14 @@ class StudentController extends Controller
             'gender' => 'nullable|string',
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
-            'profile_photo' => 'nullable|image|max:2048', // Validasi foto profil
+            'profile_photo' => 'nullable|image|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $validated = $validator->validated();
 
         // Simpan foto profil jika ada
         $profilePhotoPath = null;
@@ -61,8 +68,8 @@ class StudentController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make('password'), // Password default
-            'role' => 'student', // Role untuk siswa
+            'password' => Hash::make('password'),
+            'role' => 'student',
             'tenant_id' => auth()->user()->tenant_id,
         ]);
 
@@ -93,7 +100,7 @@ class StudentController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:students,email,' . $student->id . '|unique:users,email,' . $student->user_id,
             'class_id' => 'nullable|exists:school_classes,id',
@@ -102,17 +109,21 @@ class StudentController extends Controller
             'gender' => 'nullable|string',
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
-            'profile_photo' => 'nullable|image|max:2048', // Validasi foto profil
+            'profile_photo' => 'nullable|image|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $validated = $validator->validated();
 
         // Update foto profil jika ada
         if ($request->hasFile('profile_photo')) {
-            // Hapus foto lama jika ada
             if ($student->profile_photo) {
                 Storage::disk('public')->delete($student->profile_photo);
             }
 
-            // Simpan foto baru
             $student->profile_photo = $request->file('profile_photo')->store('profile_photos/students', 'public');
         }
 

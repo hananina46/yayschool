@@ -13,11 +13,12 @@ class SchoolClassController extends Controller
     public function index()
     {
         $schoolClasses = SchoolClass::where('tenant_id', auth()->user()->tenant_id)
-            ->with(['academicYear', 'teacher'])
+            ->with(['academicYear', 'teacher', 'schedules.subject', 'schedules.teacher'])
             ->get();
 
         return response()->json($schoolClasses);
     }
+
 
     /**
      * Store a newly created class.
@@ -48,9 +49,9 @@ class SchoolClassController extends Controller
         if ($schoolClass->tenant_id !== auth()->user()->tenant_id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
-        return response()->json($schoolClass->load(['academicYear', 'teacher']));
-    }
+    
+        return response()->json($schoolClass->load(['academicYear', 'teacher', 'schedules.subject', 'schedules.teacher']));
+    }    
 
     /**
      * Update the specified class.

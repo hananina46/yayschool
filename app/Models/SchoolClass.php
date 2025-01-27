@@ -39,4 +39,15 @@ class SchoolClass extends Model
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'class_id');
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'class_id');
+    }
+
 }

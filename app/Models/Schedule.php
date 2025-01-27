@@ -5,22 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Student extends Model
+class Schedule extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'tenant_id',
         'class_id',
-        'name',
-        'email',
-        'user_id',
-        'nisn',
-        'dob',
-        'gender',
-        'phone',
-        'address',
-        'profile_photo',
+        'subject_id',
+        'teacher_id',
+        'day',
+        'start_time',
+        'end_time',
+        'description',
     ];
 
     /**
@@ -36,20 +33,22 @@ class Student extends Model
      */
     public function class()
     {
-        return $this->belongsTo(SchoolClass::class);
+        return $this->belongsTo(SchoolClass::class, 'class_id');
     }
 
     /**
-     * Relationship to User
+     * Relationship to Subject
      */
-    public function user()
+    public function subject()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 
-    public function guardians()
+    /**
+     * Relationship to Teacher
+     */
+    public function teacher()
     {
-        return $this->belongsToMany(Guardian::class, 'guardian_student');
+        return $this->belongsTo(User::class, 'teacher_id');
     }
-
 }

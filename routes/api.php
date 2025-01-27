@@ -7,6 +7,23 @@ use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\GuardianController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\GradeController;
+use App\Http\Controllers\ExamScheduleController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Teacher\TeacherScheduleController;
+
+
+
+
+
+
+
+
 
 
 
@@ -57,4 +74,60 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('students', StudentController::class);
     Route::post('students/{student}', [StudentController::class, 'update']);
 });
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('guardians', GuardianController::class);
+    Route::post('guardians/{guardian}', [GuardianController::class, 'update']);
+
+});
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('subjects', SubjectController::class);
+});
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('schedules', ScheduleController::class);
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('attendances', AttendanceController::class);
+    Route::get('attendance/by-class', [AttendanceController::class, 'attendanceByClass']);
+    Route::get('attendance/by-period', [AttendanceController::class, 'attendanceByPeriod']);
+    Route::get('attendance/daily-summary', [AttendanceController::class, 'dailyAttendanceSummary']);
+    Route::get('attendance/student-summary', [AttendanceController::class, 'studentAttendanceSummary']);
+    Route::get('attendance/teacher-summary', [AttendanceController::class, 'teacherAttendanceSummary']);
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('grades', GradeController::class);
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('exam-schedules', ExamScheduleController::class);
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('dashboard/statistics', [DashboardController::class, 'getStatistics']);
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('users', [UserController::class, 'index']);
+    Route::post('users', [UserController::class, 'store']);
+    Route::get('users/{id}', [UserController::class, 'show']);
+    Route::put('users/{user}', [UserController::class, 'update']);
+    Route::post('users/{id}/reset-password', [UserController::class, 'resetPassword']);
+    Route::delete('users/{user}', [UserController::class, 'destroy']);
+});
+
+Route::middleware('auth:api')->prefix('teacher')->group(function () {
+    Route::get('schedules', [TeacherScheduleController::class, 'index']);
+});
+
+
+
+
+
 
