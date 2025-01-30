@@ -2,9 +2,9 @@
     <div>
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Student</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Schedule</h5>
                 <div class="flex items-center gap-5 ltr:ml-auto rtl:mr-auto">
-                    <button @click="showCreateModal" class="btn btn-primary">Add New Student</button>
+                    <button @click="showCreateModal" class="btn btn-primary">Add New Schedule</button>
                     <div>
                         <input v-model="search" type="text" class="form-input" placeholder="Search..." />
                     </div>
@@ -23,8 +23,14 @@
                     <template #class="data">
                         {{ data.value.class.name }}
                     </template>
+                    <template #subject="data">
+                        {{ data.value.subject.name }}
+                    </template>
+                    <template #teacher="data">
+                        {{ data.value.teacher.name }}
+                    </template>
                     <template #actions="data">
-                        <button class="text-yellow-500 hover:text-yellow-700" @click="editStudent(data.value)">
+                        <button class="text-yellow-500 hover:text-yellow-700" @click="editSchedule(data.value)">
                             <ion-icon name="create-outline"></ion-icon>
                         </button>
                         <button class="text-red-500 hover:text-red-700" @click="confirmDelete(data.value.id)">
@@ -70,18 +76,10 @@
                                     <ion-icon name="close-outline"></ion-icon>
                                 </button>
                                 <div class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                    {{ editMode ? 'Edit Student' : 'Add New Student' }}
+                                    {{ editMode ? 'Edit Schedule' : 'Add New Schedule' }}
                                 </div>
                                 <div class="p-5">
-                                    <form @submit.prevent="saveStudent">
-                                        <div class="form-group mb-4">
-                                            <label for="studentName" class="block text-sm font-medium">Name</label>
-                                            <input v-model="formData.name" type="text" id="studentName" class="form-input mt-1" required />
-                                        </div>
-                                        <div class="form-group mb-4">
-                                            <label for="studentEmail" class="block text-sm font-medium">Email</label>
-                                            <input v-model="formData.email" type="email" id="studentEmail" class="form-input mt-1" required />
-                                        </div>
+                                    <form @submit.prevent="saveSchedule">
                                         <div class="form-group mb-4">
                                             <label for="classId" class="block text-sm font-medium">Class</label>
                                             <select v-model="formData.class_id" id="classId" class="form-input mt-1" required>
@@ -91,31 +89,32 @@
                                             </select>
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="nisn" class="block text-sm font-medium">NISN</label>
-                                            <input v-model="formData.nisn" type="text" id="nisn" class="form-input mt-1" />
-                                        </div>
-                                        <div class="form-group mb-4">
-                                            <label for="gender" class="block text-sm font-medium">Gender</label>
-                                            <select v-model="formData.gender" id="gender" class="form-input mt-1">
-                                                <option value="M">Male</option>
-                                                <option value="F">Female</option>
+                                            <label for="subjectId" class="block text-sm font-medium">Subject</label>
+                                            <select v-model="formData.subject_id" id="subjectId" class="form-input mt-1" required>
+                                                <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
+                                                    {{ subject.name }}
+                                                </option>
                                             </select>
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="dob" class="block text-sm font-medium">Date of Birth</label>
-                                            <input v-model="formData.dob" type="date" id="dob" class="form-input mt-1" />
+                                            <label for="teacherId" class="block text-sm font-medium">Teacher</label>
+                                            <select v-model="formData.teacher_id" id="teacherId" class="form-input mt-1" required>
+                                                <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">
+                                                    {{ teacher.name }}
+                                                </option>
+                                            </select>
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="phone" class="block text-sm font-medium">Phone</label>
-                                            <input v-model="formData.phone" type="text" id="phone" class="form-input mt-1" />
+                                            <label for="day" class="block text-sm font-medium">Day</label>
+                                            <input v-model="formData.day" type="text" id="day" class="form-input mt-1" required />
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="address" class="block text-sm font-medium">Address</label>
-                                            <textarea v-model="formData.address" id="address" class="form-input mt-1"></textarea>
+                                            <label for="startTime" class="block text-sm font-medium">Start Time</label>
+                                            <input v-model="formData.start_time" type="time" id="startTime" class="form-input mt-1" required />
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="profilePhoto" class="block text-sm font-medium">Profile Photo</label>
-                                            <input @change="handleFileUpload" type="file" id="profilePhoto" class="form-input mt-1" />
+                                            <label for="endTime" class="block text-sm font-medium">End Time</label>
+                                            <input v-model="formData.end_time" type="time" id="endTime" class="form-input mt-1" required />
                                         </div>
                                         <div class="flex justify-end">
                                             <button type="button" @click="closeModal" class="btn btn-outline-danger">Cancel</button>
@@ -137,109 +136,97 @@ import { ref, onMounted } from 'vue';
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { TransitionRoot, TransitionChild, Dialog, DialogOverlay, DialogPanel } from '@headlessui/vue';
 import Swal from 'sweetalert2';
-import { getStudents, createStudent, updateStudent, deleteStudent } from '@/api/student';
+import { getSchedules, createSchedule, updateSchedule, deleteSchedule } from '@/api/schedule';
+import { getTeachers } from '@/api/teacher';
+import { getSubjects } from '@/api/subject';
 import { getSchoolClasses } from '@/api/classroom';
 import { useMeta } from '@/composables/use-meta';
 
-useMeta({ title: 'Student' });
+useMeta({ title: 'Schedule' });
 
 const search = ref('');
 const rows = ref([]);
 const cols = ref([
     { field: 'id', title: 'ID', isUnique: true, hide: false },
-    { field: 'name', title: 'Name', hide: false },
-    { field: 'email', title: 'Email', hide: false },
     { field: 'class', title: 'Class', hide: false, slotName: 'class' },
+    { field: 'subject', title: 'Subject', hide: false, slotName: 'subject' },
+    { field: 'teacher', title: 'Teacher', hide: false, slotName: 'teacher' },
+    { field: 'day', title: 'Day', hide: false },
+    { field: 'start_time', title: 'Start Time', hide: false },
+    { field: 'end_time', title: 'End Time', hide: false },
     { field: 'actions', title: 'Actions', hide: false, slotName: 'actions' },
 ]);
 
 const showModal = ref(false);
 const editMode = ref(false);
-const formData = ref({
-    id: null,
-    name: '',
-    email: '',
-    class_id: null,
-    nisn: '',
-    dob: '',
-    gender: 'M',
-    phone: '',
-    address: '',
-    profile_photo: null,
-});
+const formData = ref({ id: null, class_id: null, subject_id: null, teacher_id: null, day: '', start_time: '', end_time: '' });
+const teachers = ref([]);
+const subjects = ref([]);
 const classes = ref([]);
 
-const fetchStudents = async () => {
+const fetchData = async () => {
     try {
-        rows.value = await getStudents();
-    } catch (error) {
-        console.error('Failed to fetch students:', error);
-    }
-};
-
-const fetchClasses = async () => {
-    try {
+        rows.value = await getSchedules();
+        teachers.value = await getTeachers();
+        subjects.value = await getSubjects();
         classes.value = await getSchoolClasses();
     } catch (error) {
-        console.error('Failed to fetch classes:', error);
+        console.error('Failed to fetch data:', error);
     }
 };
 
-const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        formData.value.profile_photo = file;
-    }
-};
-
+// ** Function to show Create Modal **
 const showCreateModal = () => {
     editMode.value = false;
-    formData.value = {
-        id: null,
-        name: '',
-        email: '',
-        class_id: null,
-        nisn: '',
-        dob: '',
-        gender: 'M',
-        phone: '',
-        address: '',
-        profile_photo: null,
-    };
+    formData.value = { id: null, class_id: null, subject_id: null, teacher_id: null, day: '', start_time: '', end_time: '' };
     showModal.value = true;
 };
 
-const editStudent = (studentData) => {
+// ** Function to Edit Schedule **
+const editSchedule = (schedule) => {
     editMode.value = true;
-    formData.value = {
-        id: studentData.id,
-        name: studentData.name,
-        email: studentData.email,
-        class_id: studentData.class.id,
-        nisn: studentData.nisn,
-        dob: studentData.dob,
-        gender: studentData.gender,
-        phone: studentData.phone,
-        address: studentData.address,
-        profile_photo: null,
+    formData.value = { 
+        id: schedule.id, 
+        class_id: schedule.class.id, 
+        subject_id: schedule.subject.id, 
+        teacher_id: schedule.teacher.id, 
+        day: schedule.day, 
+        start_time: schedule.start_time, 
+        end_time: schedule.end_time 
     };
     showModal.value = true;
 };
 
-const saveStudent = async () => {
+// ** Function to Save (Create/Update) Schedule **
+const saveSchedule = async () => {
     try {
         if (editMode.value) {
-            await updateStudent(formData.value.id, formData.value);
+            await updateSchedule(formData.value.id, formData.value);
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated!',
+                text: 'Schedule has been updated successfully.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
         } else {
-            await createStudent(formData.value);
+            await createSchedule(formData.value);
+            Swal.fire({
+                icon: 'success',
+                title: 'Created!',
+                text: 'New schedule has been created successfully.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
         }
-        fetchStudents();
+        fetchData();
         closeModal();
     } catch (error) {
-        console.error('Failed to save student:', error);
+        console.error('Failed to save schedule:', error);
     }
 };
 
+// ** Function to Confirm & Delete Schedule **
 const confirmDelete = (id) => {
     Swal.fire({
         icon: 'warning',
@@ -248,17 +235,17 @@ const confirmDelete = (id) => {
         showCancelButton: true,
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel',
-        customClass: { popup: 'sweet-alerts' },
     }).then(async (result) => {
         if (result.isConfirmed) {
-            await deleteStudent(id);
+            await deleteSchedule(id);
             Swal.fire({
                 title: 'Deleted!',
-                text: 'The student has been deleted.',
+                text: 'The schedule has been deleted.',
                 icon: 'success',
-                customClass: { popup: 'sweet-alerts' },
+                timer: 2000,
+                showConfirmButton: false,
             });
-            fetchStudents();
+            fetchData();
         }
     });
 };
@@ -267,8 +254,7 @@ const closeModal = () => {
     showModal.value = false;
 };
 
-onMounted(() => {
-    fetchStudents();
-    fetchClasses();
-});
+onMounted(fetchData);
 </script>
+
+

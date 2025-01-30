@@ -2,9 +2,9 @@
     <div>
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Classroom</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Subject</h5>
                 <div class="flex items-center gap-5 ltr:ml-auto rtl:mr-auto">
-                    <button @click="showCreateModal" class="btn btn-primary">Add New Class</button>
+                    <button @click="showCreateModal" class="btn btn-primary">Add New Subject</button>
                     <div>
                         <input v-model="search" type="text" class="form-input" placeholder="Search..." />
                     </div>
@@ -20,11 +20,8 @@
                     :search="search"
                     skin="whitespace-nowrap bh-table-hover"
                 >
-                    <template #teacher="data">
-                        {{ data.value.teacher.name }}
-                    </template>
                     <template #actions="data">
-                        <button class="text-yellow-500 hover:text-yellow-700" @click="editClass(data.value)">
+                        <button class="text-yellow-500 hover:text-yellow-700" @click="editSubject(data.value)">
                             <ion-icon name="create-outline"></ion-icon>
                         </button>
                         <button class="text-red-500 hover:text-red-700" @click="confirmDelete(data.value.id)">
@@ -69,32 +66,22 @@
                                 >
                                     <ion-icon name="close-outline"></ion-icon>
                                 </button>
-                                <div
-                                    class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]"
-                                >
-                                    {{ editMode ? 'Edit Class' : 'Add New Class' }}
+                                <div class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                                    {{ editMode ? 'Edit Subject' : 'Add New Subject' }}
                                 </div>
                                 <div class="p-5">
-                                    <form @submit.prevent="saveClass">
+                                    <form @submit.prevent="saveSubject">
                                         <div class="form-group mb-4">
-                                            <label for="className" class="block text-sm font-medium">Class Name</label>
-                                            <input v-model="formData.name" type="text" id="className" class="form-input mt-1" required />
+                                            <label for="subjectName" class="block text-sm font-medium">Subject Name</label>
+                                            <input v-model="formData.name" type="text" id="subjectName" class="form-input mt-1" required />
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="teacherId" class="block text-sm font-medium">Teacher</label>
-                                            <select v-model="formData.teacher_id" id="teacherId" class="form-input mt-1" required>
-                                                <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">
-                                                    {{ teacher.name }}
-                                                </option>
-                                            </select>
+                                            <label for="subjectCode" class="block text-sm font-medium">Code</label>
+                                            <input v-model="formData.code" type="text" id="subjectCode" class="form-input mt-1" required />
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="academicYearId" class="block text-sm font-medium">Academic Year</label>
-                                            <select v-model="formData.academic_year_id" id="academicYearId" class="form-input mt-1" required>
-                                                <option v-for="year in academicYears" :key="year.id" :value="year.id">
-                                                    {{ year.name }}
-                                                </option>
-                                            </select>
+                                            <label for="description" class="block text-sm font-medium">Description</label>
+                                            <textarea v-model="formData.description" id="description" class="form-input mt-1"></textarea>
                                         </div>
                                         <div class="flex justify-end">
                                             <button type="button" @click="closeModal" class="btn btn-outline-danger">Cancel</button>
@@ -116,80 +103,71 @@ import { ref, onMounted } from 'vue';
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { TransitionRoot, TransitionChild, Dialog, DialogOverlay, DialogPanel } from '@headlessui/vue';
 import Swal from 'sweetalert2';
-import { getSchoolClasses, createSchoolClass, updateSchoolClass, deleteSchoolClass } from '@/api/classroom';
-import { getTeachers } from '@/api/teacher';
-import { getAcademicYears } from '@/api/academicYear';
+import { getSubjects, createSubject, updateSubject, deleteSubject } from '@/api/subject';
 import { useMeta } from '@/composables/use-meta';
 
-useMeta({ title: 'Classroom' });
+useMeta({ title: 'Subject' });
 
 const search = ref('');
 const rows = ref([]);
 const cols = ref([
     { field: 'id', title: 'ID', isUnique: true, hide: false },
-    { field: 'name', title: 'Class Name', hide: false },
-    { field: 'teacher', title: 'Teacher', hide: false, slotName: 'teacher' },
+    { field: 'name', title: 'Subject Name', hide: false },
+    { field: 'code', title: 'Code', hide: false },
+    { field: 'description', title: 'Description', hide: false },
     { field: 'actions', title: 'Actions', hide: false, slotName: 'actions' },
 ]);
 
 const showModal = ref(false);
 const editMode = ref(false);
-const formData = ref({ id: null, name: '', teacher_id: null, academic_year_id: null });
-const teachers = ref([]);
-const academicYears = ref([]);
+const formData = ref({
+    id: null,
+    name: '',
+    code: '',
+    description: '',
+});
 
-const fetchClasses = async () => {
+const fetchSubjects = async () => {
     try {
-        rows.value = await getSchoolClasses();
+        rows.value = await getSubjects();
     } catch (error) {
-        console.error('Failed to fetch classes:', error);
-    }
-};
-
-const fetchTeachers = async () => {
-    try {
-        teachers.value = await getTeachers();
-    } catch (error) {
-        console.error('Failed to fetch teachers:', error);
-    }
-};
-
-const fetchAcademicYears = async () => {
-    try {
-        academicYears.value = await getAcademicYears();
-    } catch (error) {
-        console.error('Failed to fetch academic years:', error);
+        console.error('Failed to fetch subjects:', error);
     }
 };
 
 const showCreateModal = () => {
     editMode.value = false;
-    formData.value = { id: null, name: '', teacher_id: null, academic_year_id: null };
-    showModal.value = true;
-};
-
-const editClass = (classData) => {
-    editMode.value = true;
     formData.value = {
-        id: classData.id,
-        name: classData.name,
-        teacher_id: classData.teacher.id,
-        academic_year_id: classData.academic_year_id,
+        id: null,
+        name: '',
+        code: '',
+        description: '',
     };
     showModal.value = true;
 };
 
-const saveClass = async () => {
+const editSubject = (subjectData) => {
+    editMode.value = true;
+    formData.value = {
+        id: subjectData.id,
+        name: subjectData.name,
+        code: subjectData.code,
+        description: subjectData.description,
+    };
+    showModal.value = true;
+};
+
+const saveSubject = async () => {
     try {
         if (editMode.value) {
-            await updateSchoolClass(formData.value.id, formData.value);
+            await updateSubject(formData.value.id, formData.value);
         } else {
-            await createSchoolClass(formData.value);
+            await createSubject(formData.value);
         }
-        fetchClasses();
+        fetchSubjects();
         closeModal();
     } catch (error) {
-        console.error('Failed to save class:', error);
+        console.error('Failed to save subject:', error);
     }
 };
 
@@ -204,24 +182,10 @@ const confirmDelete = (id) => {
         customClass: { popup: 'sweet-alerts' },
     }).then(async (result) => {
         if (result.isConfirmed) {
-            await deleteClass(id);
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'The class has been deleted.',
-                icon: 'success',
-                customClass: { popup: 'sweet-alerts' },
-            });
+            await deleteSubject(id);
+            fetchSubjects();
         }
     });
-};
-
-const deleteClass = async (id) => {
-    try {
-        await deleteSchoolClass(id);
-        fetchClasses();
-    } catch (error) {
-        console.error('Failed to delete class:', error);
-    }
 };
 
 const closeModal = () => {
@@ -229,8 +193,6 @@ const closeModal = () => {
 };
 
 onMounted(() => {
-    fetchClasses();
-    fetchTeachers();
-    fetchAcademicYears();
+    fetchSubjects();
 });
 </script>

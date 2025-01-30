@@ -2,9 +2,9 @@
     <div>
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Student</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Guardian</h5>
                 <div class="flex items-center gap-5 ltr:ml-auto rtl:mr-auto">
-                    <button @click="showCreateModal" class="btn btn-primary">Add New Student</button>
+                    <button @click="showCreateModal" class="btn btn-primary">Add New Guardian</button>
                     <div>
                         <input v-model="search" type="text" class="form-input" placeholder="Search..." />
                     </div>
@@ -13,18 +13,20 @@
 
             <div class="datatable">
                 <vue3-datatable
-                    :rows="rows"
+                    :rows="rows" 
                     :columns="cols"
                     :totalRows="rows?.length"
                     :sortable="true"
                     :search="search"
                     skin="whitespace-nowrap bh-table-hover"
                 >
-                    <template #class="data">
-                        {{ data.value.class.name }}
+                    <template #students="data">
+                        <span v-for="student in data.value.students" :key="student.id">
+                            {{ student.name }},
+                        </span>
                     </template>
                     <template #actions="data">
-                        <button class="text-yellow-500 hover:text-yellow-700" @click="editStudent(data.value)">
+                        <button class="text-yellow-500 hover:text-yellow-700" @click="editGuardian(data.value)">
                             <ion-icon name="create-outline"></ion-icon>
                         </button>
                         <button class="text-red-500 hover:text-red-700" @click="confirmDelete(data.value.id)">
@@ -70,40 +72,17 @@
                                     <ion-icon name="close-outline"></ion-icon>
                                 </button>
                                 <div class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                    {{ editMode ? 'Edit Student' : 'Add New Student' }}
+                                    {{ editMode ? 'Edit Guardian' : 'Add New Guardian' }}
                                 </div>
                                 <div class="p-5">
-                                    <form @submit.prevent="saveStudent">
+                                    <form @submit.prevent="saveGuardian">
                                         <div class="form-group mb-4">
-                                            <label for="studentName" class="block text-sm font-medium">Name</label>
-                                            <input v-model="formData.name" type="text" id="studentName" class="form-input mt-1" required />
+                                            <label for="guardianName" class="block text-sm font-medium">Name</label>
+                                            <input v-model="formData.name" type="text" id="guardianName" class="form-input mt-1" required />
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="studentEmail" class="block text-sm font-medium">Email</label>
-                                            <input v-model="formData.email" type="email" id="studentEmail" class="form-input mt-1" required />
-                                        </div>
-                                        <div class="form-group mb-4">
-                                            <label for="classId" class="block text-sm font-medium">Class</label>
-                                            <select v-model="formData.class_id" id="classId" class="form-input mt-1" required>
-                                                <option v-for="classItem in classes" :key="classItem.id" :value="classItem.id">
-                                                    {{ classItem.name }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mb-4">
-                                            <label for="nisn" class="block text-sm font-medium">NISN</label>
-                                            <input v-model="formData.nisn" type="text" id="nisn" class="form-input mt-1" />
-                                        </div>
-                                        <div class="form-group mb-4">
-                                            <label for="gender" class="block text-sm font-medium">Gender</label>
-                                            <select v-model="formData.gender" id="gender" class="form-input mt-1">
-                                                <option value="M">Male</option>
-                                                <option value="F">Female</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mb-4">
-                                            <label for="dob" class="block text-sm font-medium">Date of Birth</label>
-                                            <input v-model="formData.dob" type="date" id="dob" class="form-input mt-1" />
+                                            <label for="guardianEmail" class="block text-sm font-medium">Email</label>
+                                            <input v-model="formData.email" type="email" id="guardianEmail" class="form-input mt-1" required />
                                         </div>
                                         <div class="form-group mb-4">
                                             <label for="phone" class="block text-sm font-medium">Phone</label>
@@ -114,8 +93,12 @@
                                             <textarea v-model="formData.address" id="address" class="form-input mt-1"></textarea>
                                         </div>
                                         <div class="form-group mb-4">
-                                            <label for="profilePhoto" class="block text-sm font-medium">Profile Photo</label>
-                                            <input @change="handleFileUpload" type="file" id="profilePhoto" class="form-input mt-1" />
+                                            <label for="students" class="block text-sm font-medium">Students</label>
+                                            <select v-model="formData.student_ids" multiple id="students" class="form-input mt-1">
+                                                <option v-for="student in students" :key="student.id" :value="student.id">
+                                                    {{ student.name }}
+                                                </option>
+                                            </select>
                                         </div>
                                         <div class="flex justify-end">
                                             <button type="button" @click="closeModal" class="btn btn-outline-danger">Cancel</button>
@@ -137,11 +120,11 @@ import { ref, onMounted } from 'vue';
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { TransitionRoot, TransitionChild, Dialog, DialogOverlay, DialogPanel } from '@headlessui/vue';
 import Swal from 'sweetalert2';
-import { getStudents, createStudent, updateStudent, deleteStudent } from '@/api/student';
-import { getSchoolClasses } from '@/api/classroom';
+import { getGuardians, createGuardian, updateGuardian, deleteGuardian } from '@/api/guardian';
+import { getStudents } from '@/api/student';
 import { useMeta } from '@/composables/use-meta';
 
-useMeta({ title: 'Student' });
+useMeta({ title: 'Guardian' });
 
 const search = ref('');
 const rows = ref([]);
@@ -149,7 +132,8 @@ const cols = ref([
     { field: 'id', title: 'ID', isUnique: true, hide: false },
     { field: 'name', title: 'Name', hide: false },
     { field: 'email', title: 'Email', hide: false },
-    { field: 'class', title: 'Class', hide: false, slotName: 'class' },
+    { field: 'phone', title: 'Phone', hide: false },
+    { field: 'students', title: 'Students', hide: false, slotName: 'students' },
     { field: 'actions', title: 'Actions', hide: false, slotName: 'actions' },
 ]);
 
@@ -159,36 +143,25 @@ const formData = ref({
     id: null,
     name: '',
     email: '',
-    class_id: null,
-    nisn: '',
-    dob: '',
-    gender: 'M',
     phone: '',
     address: '',
-    profile_photo: null,
+    student_ids: [],
 });
-const classes = ref([]);
+const students = ref([]);
+
+const fetchGuardians = async () => {
+    try {
+        rows.value = await getGuardians();
+    } catch (error) {
+        console.error('Failed to fetch guardians:', error);
+    }
+};
 
 const fetchStudents = async () => {
     try {
-        rows.value = await getStudents();
+        students.value = await getStudents();
     } catch (error) {
         console.error('Failed to fetch students:', error);
-    }
-};
-
-const fetchClasses = async () => {
-    try {
-        classes.value = await getSchoolClasses();
-    } catch (error) {
-        console.error('Failed to fetch classes:', error);
-    }
-};
-
-const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        formData.value.profile_photo = file;
     }
 };
 
@@ -198,45 +171,37 @@ const showCreateModal = () => {
         id: null,
         name: '',
         email: '',
-        class_id: null,
-        nisn: '',
-        dob: '',
-        gender: 'M',
         phone: '',
         address: '',
-        profile_photo: null,
+        student_ids: [],
     };
     showModal.value = true;
 };
 
-const editStudent = (studentData) => {
+const editGuardian = (guardianData) => {
     editMode.value = true;
     formData.value = {
-        id: studentData.id,
-        name: studentData.name,
-        email: studentData.email,
-        class_id: studentData.class.id,
-        nisn: studentData.nisn,
-        dob: studentData.dob,
-        gender: studentData.gender,
-        phone: studentData.phone,
-        address: studentData.address,
-        profile_photo: null,
+        id: guardianData.id,
+        name: guardianData.name,
+        email: guardianData.email,
+        phone: guardianData.phone,
+        address: guardianData.address,
+        student_ids: guardianData.students.map(student => student.id),
     };
     showModal.value = true;
 };
 
-const saveStudent = async () => {
+const saveGuardian = async () => {
     try {
         if (editMode.value) {
-            await updateStudent(formData.value.id, formData.value);
+            await updateGuardian(formData.value.id, formData.value);
         } else {
-            await createStudent(formData.value);
+            await createGuardian(formData.value);
         }
-        fetchStudents();
+        fetchGuardians();
         closeModal();
     } catch (error) {
-        console.error('Failed to save student:', error);
+        console.error('Failed to save guardian:', error);
     }
 };
 
@@ -251,14 +216,8 @@ const confirmDelete = (id) => {
         customClass: { popup: 'sweet-alerts' },
     }).then(async (result) => {
         if (result.isConfirmed) {
-            await deleteStudent(id);
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'The student has been deleted.',
-                icon: 'success',
-                customClass: { popup: 'sweet-alerts' },
-            });
-            fetchStudents();
+            await deleteGuardian(id);
+            fetchGuardians();
         }
     });
 };
@@ -268,7 +227,7 @@ const closeModal = () => {
 };
 
 onMounted(() => {
+    fetchGuardians();
     fetchStudents();
-    fetchClasses();
 });
 </script>

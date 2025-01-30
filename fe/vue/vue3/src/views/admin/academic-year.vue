@@ -2,7 +2,7 @@
     <div>
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Academic Year CRUD</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Academic Year  </h5>
 
                 <div class="flex items-center gap-5 ltr:ml-auto rtl:mr-auto">
                     <button @click="showCreateModal" class="btn btn-primary">Add New Academic Year</button>
@@ -111,6 +111,9 @@ import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { TransitionRoot, TransitionChild, Dialog, DialogOverlay, DialogPanel } from '@headlessui/vue';
 import Swal from 'sweetalert2';
 import { getAcademicYears, createAcademicYear, updateAcademicYear, deleteAcademicYear } from '@/api/academicYear';
+import { useMeta } from '@/composables/use-meta';
+
+useMeta({ title: 'Academic Year' });
 
 const search = ref('');
 const rows = ref([]);

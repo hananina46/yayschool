@@ -49,7 +49,7 @@ class ScheduleController extends Controller
             'day' => $validated['day'],
             'start_time' => $validated['start_time'],
             'end_time' => $validated['end_time'],
-            'description' => $validated['description'],
+
         ]);
 
         return response()->json($schedule, 201);
@@ -87,7 +87,6 @@ class ScheduleController extends Controller
             'day' => 'required|string|max:20',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {

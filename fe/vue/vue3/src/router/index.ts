@@ -64,6 +64,34 @@ const routes: RouteRecordRaw[] = [
         component: () => import(/* webpackChunkName: "analytics" */ '../views/admin/student.vue'),
         meta: { requiresAuth: true }
     },
+    //guardian
+    {
+        path: '/school/guardian',
+        name: 'admin_guardian',
+        component: () => import(/* webpackChunkName: "analytics" */ '../views/admin/guardian.vue'),
+        meta: { requiresAuth: true }
+    },
+    //subject
+    {
+        path: '/school/subject',
+        name: 'admin_subject',
+        component: () => import(/* webpackChunkName: "analytics" */ '../views/admin/subject.vue'),
+        meta: { requiresAuth: true }
+    },
+    //schedule
+    {
+        path: '/school/schedule',
+        name: 'admin_schedule',
+        component: () => import(/* webpackChunkName: "analytics" */ '../views/admin/schedule.vue'),
+        meta: { requiresAuth: true }
+    },
+    //admin dashboard
+    {
+        path: '/school/dashboard',
+        name: 'admin_dashboard',
+        component: () => import(/* webpackChunkName: "analytics" */ '../views/admin/dashboard.vue'),
+        meta: { requiresAuth: true }
+    },
     {
         path: '/finance',
         name: 'finance',
