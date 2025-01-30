@@ -16,6 +16,12 @@ use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Teacher\TeacherScheduleController;
+use App\Http\Controllers\Teacher\ProfileController;
+use App\Http\Controllers\ChatController;
+
+Route::post('/chat', [ChatController::class, 'handleHuggingFace']);
+Route::post('/chat1', [ChatController::class, 'handleTogether']);
+
 
 
 
@@ -124,7 +130,10 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('auth:api')->prefix('teacher')->group(function () {
     Route::get('schedules', [TeacherScheduleController::class, 'index']);
+    Route::get('my-profile', [ProfileController::class, 'myProfile']);
+
 });
+
 
 
 
