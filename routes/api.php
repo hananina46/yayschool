@@ -18,12 +18,28 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Teacher\TeacherScheduleController;
 use App\Http\Controllers\Teacher\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\Parent\AttendancesController;
+use App\Http\Controllers\GradeTypeController;
+
 
 Route::post('/chat', [ChatController::class, 'handleHuggingFace']);
 Route::post('/chat1', [ChatController::class, 'handleTogether']);
+//yay
+Route::post('/yay', [ChatController::class, 'handleYay']);
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('grade-types', GradeTypeController::class);
+});
 
 
-
+//parent, prefix attendance
+Route::middleware('auth:api')->prefix('parent_area')->group(function () {
+    //list anak 
+    Route::get('students', [AttendancesController::class, 'students']);
+    //presence/id
+    Route::get('presence/{studentId}', [AttendancesController::class, 'getStudentAttendance']);
+    //student detail
+    Route::get('student/{studentId}', [AttendancesController::class, 'getStudentDetail']);
+});
 
 
 
@@ -46,6 +62,9 @@ Route::post('/chat1', [ChatController::class, 'handleTogether']);
 |
 */
 
+//parent login 
+Route::post('parent-login', [AuthController::class, 'parentLogin']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -56,6 +75,8 @@ Route::prefix('auth')->group(function () {
     Route::post('register-user', [AuthController::class, 'registerUser']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
+    //me
+    Route::get('me', [AuthController::class, 'me']);
 });
 
 

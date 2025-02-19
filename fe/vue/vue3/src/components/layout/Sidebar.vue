@@ -165,6 +165,25 @@
                         </li>
                         <h2 class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                             <icon-minus class="w-4 h-5 flex-none hidden" />
+                            <span>{{ $t('Grade') }}</span>
+                        </h2>
+                        <li class="menu nav-item">
+                            <li class="nav-item">
+                                    <router-link to="/school/grade-types" class="group" @click="toggleMobileMenu">
+                                        <div class="flex items-center">
+                                            <icon-menu-attendance class="group-hover:!text-primary shrink-0" />
+
+                                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{{
+                                                $t('Grade Types')
+                                            }}</span>
+                                        </div>
+                                    </router-link>
+                            </li>
+
+
+                        </li>
+                        <h2 class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                            <icon-minus class="w-4 h-5 flex-none hidden" />
                             <span>{{ $t('supports') }}</span>
                         </h2>
 

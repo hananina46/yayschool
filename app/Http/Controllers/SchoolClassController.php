@@ -11,13 +11,19 @@ class SchoolClassController extends Controller
      * Display a listing of the classes.
      */
     public function index()
-    {
-        $schoolClasses = SchoolClass::where('tenant_id', auth()->user()->tenant_id)
-            ->with(['academicYear', 'teacher', 'schedules.subject', 'schedules.teacher'])
-            ->get();
+{
+    $schoolClasses = SchoolClass::where('tenant_id', auth()->user()->tenant_id)
+        ->with([
+            'academicYear', 
+            'teacher', 
+            'schedules.subject', 
+            'schedules.teacher', 
+            'students' // Tambahkan relasi 'students' di sini
+        ])
+        ->get();
 
-        return response()->json($schoolClasses);
-    }
+    return response()->json($schoolClasses);
+}
 
 
     /**
@@ -50,7 +56,7 @@ class SchoolClassController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
     
-        return response()->json($schoolClass->load(['academicYear', 'teacher', 'schedules.subject', 'schedules.teacher']));
+        return response()->json($schoolClass->load(['academicYear', 'teacher', 'schedules.subject', 'schedules.teacher', 'students']));
     }    
 
     /**

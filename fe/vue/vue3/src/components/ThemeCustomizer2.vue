@@ -9,17 +9,18 @@
 
         <!-- Sidebar Chat -->
         <nav
-            class="bg-white fixed ltr:-right-[400px] rtl:-left-[400px] top-0 bottom-0 w-full max-w-[400px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-[right] duration-300 z-[51] dark:bg-[#0e1726] p-4 flex flex-col"
+            class="bg-white fixed ltr:-right-[400px] rtl:-left-[400px] top-0 bottom-0 w-full max-w-[400px] shadow-lg transition-[right] duration-300 z-[51] dark:bg-[#0e1726] p-4 flex flex-col"
             :class="{ 'ltr:!right-0 rtl:!left-0': showCustomizer }"
         >
             <!-- Tombol Buka/Tutup -->
             <a
-                href="javascript:;"
-                class="bg-primary ltr:rounded-tl-full rtl:rounded-tr-full ltr:rounded-bl-full rtl:rounded-br-full absolute ltr:-left-12 rtl:-right-12 top-0 bottom-0 my-auto w-12 h-10 flex justify-center items-center text-white cursor-pointer"
-                @click="showCustomizer = !showCustomizer"
-            >
-                <icon-settings class="animate-[spin_3s_linear_infinite] w-5 h-5" />
-            </a>
+    href="javascript:;"
+    class="bg-pink-500 absolute ltr:-left-12 rtl:-right-12 top-0 bottom-0 my-auto w-12 h-10 flex justify-center items-center text-white cursor-pointer rounded-full"
+    @click="showCustomizer = !showCustomizer"
+>
+    <icon-chatting class="w-5 h-5" />
+</a>
+
 
             <!-- Header -->
             <div class="text-center pb-5 border-b border-gray-200 dark:border-gray-700">
@@ -37,9 +38,9 @@
                     </div>
 
                     <!-- Pesan -->
-                    <div class="p-3 rounded-lg" 
+                    <div class="p-3 rounded-lg max-w-[75%]" 
                          :class="message.role === 'user' ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-900'">
-                        {{ message.content }}
+                        <span v-html="formatMessage(message.content)"></span>
                     </div>
                 </div>
 
@@ -69,13 +70,17 @@
                 </div>
             </div>
         </nav>
-    </div>
+    </div> 
 </template>
 
 <script lang="ts" setup>
 import { ref, nextTick } from 'vue';
 import { useAppStore } from '@/stores/index';
 import IconSettings from '@/components/icon/icon-settings.vue';
+import iconChatting from './icon/icon-chatting.vue';
+
+// Ambil API URL dari .env
+const API_URL = import.meta.env.VITE_BASE_URL + "/api/yay";
 
 const store = useAppStore();
 const showCustomizer = ref(false);
@@ -103,13 +108,14 @@ const sendMessage = async () => {
     loading.value = true;
 
     try {
-        const response = await fetch("https://backoffice.al-wafi.sch.id/api/chat1", {
+        const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ messages: [...messages.value] })
         });
 
         const data = await response.json();
+        console.log(data);
         const aiResponse = data.content || "Maaf, terjadi kesalahan.";
 
         // Tambahkan pesan dari AI ke dalam chat
@@ -124,5 +130,18 @@ const sendMessage = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+// Fungsi untuk Memformat Pesan AI
+const formatMessage = (text: string): string => {
+    // Ganti **teks** menjadi bold
+    text = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+
+    // Format list dengan angka atau bullet
+    text = text.replace(/\d+\.\s/g, "<br>▪ ");
+    text = text.replace(/(\n-|\n•)/g, "<br>▪ ");
+
+    // Ubah \n menjadi <br> agar tampil sebagai paragraf
+    return text.replace(/\n/g, "<br>");
 };
 </script>

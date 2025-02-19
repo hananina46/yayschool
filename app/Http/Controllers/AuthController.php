@@ -14,6 +14,30 @@ class AuthController extends Controller
     /**
      * Register Tenant and Admin
      */
+
+    //parent login
+    public function parentLogin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $credentials = $request->only('email', 'password');
+
+        if (!$token = Auth::attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json([
+            'token' => $token,
+            'user' => Auth::user(),
+        ]);
+    }
     public function registerTenant(Request $request)
     {
         $validator = Validator::make($request->all(), [

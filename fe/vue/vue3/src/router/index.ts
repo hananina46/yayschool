@@ -43,6 +43,19 @@ const routes: RouteRecordRaw[] = [
         component: () => import(/* webpackChunkName: "analytics" */ '../views/admin/classroom.vue'),
         meta: { requiresAuth: true }
     },
+    {
+    path: '/view-classroom/:id',
+    name: 'view_classroom',
+    component: () => import(/* webpackChunkName: "view-classroom" */ '../views/admin/view-classroom.vue'),
+    meta: { requiresAuth: true }
+},
+{
+    path: '/view-classroom/:id',
+    name: 'view_classroom',
+    component: () => import(/* webpackChunkName: "view-classroom" */ '../views/admin/view-classroom.vue'),
+    meta: { requiresAuth: true }
+},
+
     //academic year
     {
         path: '/school/academic-year',
@@ -92,6 +105,27 @@ const routes: RouteRecordRaw[] = [
         component: () => import(/* webpackChunkName: "analytics" */ '../views/admin/dashboard.vue'),
         meta: { requiresAuth: true }
     },
+    {
+        path: '/school/attendance',
+        name: 'admin_attendance',
+        component: () => import(/* webpackChunkName: "attendances" */ '../views/admin/attendances.vue'),
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/school/make-attendance',
+        name: 'make_attendance',
+        component: () => import(/* webpackChunkName: "make-attendance" */ '../views/admin/make-attendance.vue'),
+        meta: { requiresAuth: true }
+    },
+    //gradeTypes.vue
+    {
+        path: '/school/grade-types',
+        name: 'grade_types',
+        component: () => import(/* webpackChunkName: "grade-types" */ '../views/admin/gradeTypes.vue'),
+        meta: { requiresAuth: true }
+    },
+    
+    
     {
         path: '/finance',
         name: 'finance',
