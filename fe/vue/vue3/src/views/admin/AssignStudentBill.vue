@@ -67,7 +67,7 @@
                                     Assign Students to Bill
                                 </div>
                                 <div class="p-5">
-                                    <form @submit.prevent="assignStudents">
+                                    <form @submit.prevent="saveBill">
                                         <div class="form-group mb-4">
                                             <label class="block text-sm font-medium">Students</label>
                                             <VueMultiselect 
@@ -78,6 +78,7 @@
                                                 track-by="id"
                                                 label="name"
                                                 placeholder="Search & Select Students"
+                                                :disabled="editMode" 
                                                 class="mt-1"
                                             />
                                         </div>
@@ -110,10 +111,26 @@
         <option value="credit_card">Credit Card</option>
     </select>
 </div>
+<div class="form-group mb-4">
+    <label class="block text-sm font-medium">Status</label>
+    <select v-model="formData.status" class="form-input mt-1" required>
+        <option value="pending">Pending</option>
+        <option value="paid">Paid</option>
+        <option value="overdue">Overdue</option>
+    </select>
+</div>
+
 
 <div class="form-group mb-4">
     <label class="block text-sm font-medium">Payment Proof</label>
     <input type="file" @change="handleFileUpload" class="form-input mt-1" />
+</div>
+
+<!--if editMode, a href file-->
+<div v-if="editMode && formData.payment_proof_url">
+    <a :href="`${baseURL}/${formData.payment_proof_url}`" target="_blank" class="block text-sm font-medium text-blue-500 hover:underline">
+        View Payment Proof
+    </a>
 </div>
 
                                         <div class="form-group mb-4">
@@ -147,9 +164,10 @@ import Swal from 'sweetalert2';
 import { getStudents } from '@/api/student';
 import { getAcademicYears } from '@/api/academicYear';
 import { getBillTypes } from '@/api/billType';
-import { createAssignedBill, getAssignedBills, deleteAssignedBill } from '@/api/assignedBill';
+import { createAssignedBill, getAssignedBills, deleteAssignedBill, updateAssignedBill } from '@/api/assignedBill';
 import { useMeta } from '@/composables/use-meta';
 
+const baseURL = import.meta.env.VITE_BASE_URL; // Simpan VITE_BASE_URL ke dalam variabel
 useMeta({ title: 'Assign Students to Bill' });
 
 const search = ref('');
@@ -186,7 +204,11 @@ const formData = ref({
     bill_type_id: '',
     discount: 0,
     note: '',
+    status: 'pending',  // Default statusnya adalah 'pending'
+    payment_method: '',
+    payment_proof: null,
 });
+
 
 const fetchData = async () => {
     assignedBills.value = await getAssignedBills();
@@ -198,16 +220,20 @@ const editAssignedBill = (billData) => {
     editMode.value = true;
     selectedBillId.value = billData.id;
     formData.value = {
-        student_ids: [{ id: billData.student.id, name: billData.student.name }],
+        student_ids: [billData.student],
+        student_id: billData.student.id,  // Hanya satu siswa yang sedang diedit
         academic_year_id: billData.academic_year.id,
         bill_type_id: billData.bill_type.id,
         discount: billData.discount,
         note: billData.note,
+        
         payment_method: billData.payment_method,
         payment_proof: null, // Karena gambar tidak bisa langsung dimasukkan
+        payment_proof_url: billData.payment_proof,
     };
     showModal.value = true;
 };
+
 
 const showAssignModal = () => {
     editMode.value = false;
@@ -226,6 +252,7 @@ const showAssignModal = () => {
 
 
 const saveBill = async () => {
+    console.log('formData:', formData.value);   
     try {
         if (editMode.value) {
             await updateAssignedBill(selectedBillId.value, formData.value);
@@ -235,7 +262,7 @@ const saveBill = async () => {
                     student_id: student.id,
                     academic_year_id: formData.value.academic_year_id,
                     bill_type_id: formData.value.bill_type_id,
-                    status: 'pending',
+                    status: formData.value.status,
                     discount: formData.value.discount,
                     note: formData.value.note,
                     payment_method: formData.value.payment_method,

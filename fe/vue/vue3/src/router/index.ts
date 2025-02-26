@@ -164,6 +164,14 @@ const routes: RouteRecordRaw[] = [
         component: () => import(/* webpackChunkName: "student-show" */ '../views/admin/StudentShow.vue'),
         meta: { requiresAuth: true }
     },
+
+    //DocumentType.vue
+    {
+        path: '/school/document-types',
+        name: 'document_type',
+        component: () => import(/* webpackChunkName: "document-type" */ '../views/admin/DocumentType.vue'),
+        meta: { requiresAuth: true }
+    },
     
     
     

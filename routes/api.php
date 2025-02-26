@@ -22,6 +22,19 @@ use App\Http\Controllers\Parent\AttendancesController;
 use App\Http\Controllers\GradeTypeController;
 use App\Http\Controllers\BillTypeController;
 use App\Http\Controllers\AssignedBillController;
+use App\Http\Controllers\DocumentTypeController;
+use App\Http\Controllers\DocumentController;
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('documents', DocumentController::class);
+    //documentsByUser
+    Route::get('documents/user/{userId}', [DocumentController::class, 'documentsByUser']);
+});
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('document-types', DocumentTypeController::class);
+});
 
 
 Route::post('/chat', [ChatController::class, 'handleHuggingFace']);
@@ -38,6 +51,7 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('assigned-bills', AssignedBillController::class);
+    Route::post('assigned-bills/{assignedBill}', [AssignedBillController::class, 'update']);
 });
 Route::middleware('auth:api')->group(function () {
     Route::get('assigned-bills/student/{studentId}', [AssignedBillController::class, 'getStudentBills']);

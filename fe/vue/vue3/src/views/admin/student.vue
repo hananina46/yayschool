@@ -145,6 +145,7 @@ import { getSchoolClasses } from '@/api/classroom';
 import { useMeta } from '@/composables/use-meta';
 import { useRouter } from 'vue-router';
 
+
 const router = useRouter();
 
 const showStudentDetail = (studentId) => {
