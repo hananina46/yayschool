@@ -24,6 +24,9 @@
                         {{ data.value.class.name }}
                     </template>
                     <template #actions="data">
+                        <button class="text-blue-500 hover:text-blue-700" @click="showStudentDetail(data.value.id)">
+                            <ion-icon name="eye-outline"></ion-icon>
+                        </button>
                         <button class="text-yellow-500 hover:text-yellow-700" @click="editStudent(data.value)">
                             <ion-icon name="create-outline"></ion-icon>
                         </button>
@@ -140,6 +143,14 @@ import Swal from 'sweetalert2';
 import { getStudents, createStudent, updateStudent, deleteStudent } from '@/api/student';
 import { getSchoolClasses } from '@/api/classroom';
 import { useMeta } from '@/composables/use-meta';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const showStudentDetail = (studentId) => {
+    router.push({ name: 'student_show', params: { studentId } });
+};
+
 
 useMeta({ title: 'Student' });
 

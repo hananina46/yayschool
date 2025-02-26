@@ -124,6 +124,48 @@ const routes: RouteRecordRaw[] = [
         component: () => import(/* webpackChunkName: "grade-types" */ '../views/admin/gradeTypes.vue'),
         meta: { requiresAuth: true }
     },
+    {
+        path: '/school/grade',
+        name: 'grade',
+        component: () => import(/* webpackChunkName: "grade-types" */ '../views/admin/grade.vue'),
+        meta: { requiresAuth: true }
+    },
+
+    //bill type
+    {
+        path: '/school/bill-types', 
+        name: 'bill_type',
+        component: () => import(/* webpackChunkName: "bill-type" */ '../views/admin/billType.vue'),
+        meta: { requiresAuth: true }
+    },
+
+    //AssignStudentBill
+    {
+        path: '/school/assign-student-bill',    
+        name: 'assign_student_bill',
+        component: () => import(/* webpackChunkName: "assign-student-bill" */ '../views/admin/AssignStudentBill.vue'),
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/school/select-student-bill',    
+        name: 'select_student_bill',
+        component: () => import(/* webpackChunkName: "select-student-bill" */ '../views/admin/SelectStudentBill.vue'),
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/school/assigned-student-bill/:studentId',
+        name: 'assigned_student_bill_view',
+        component: () => import(/* webpackChunkName: "assigned-student-bill-view" */ '../views/admin/AssignStudentBillView.vue'),
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/school/student/:studentId',
+        name: 'student_show',
+        component: () => import(/* webpackChunkName: "student-show" */ '../views/admin/StudentShow.vue'),
+        meta: { requiresAuth: true }
+    },
+    
+    
     
     
     {

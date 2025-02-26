@@ -52,4 +52,16 @@ class Student extends Model
         return $this->belongsToMany(Guardian::class, 'guardian_student');
     }
 
+    //grade
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
+
+    //bill
+    public function bills()
+    {
+        return $this->hasMany(AssignedBill::class);
+    }
+
 }

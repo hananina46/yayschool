@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\GradeType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,7 +15,7 @@ class GradeController extends Controller
     public function index()
     {
         $grades = Grade::where('tenant_id', auth()->user()->tenant_id)
-            ->with(['student', 'subject', 'class'])
+            ->with(['student', 'subject', 'class', 'gradeType', 'academicYear'])
             ->get();
 
         return response()->json($grades);
@@ -29,7 +30,8 @@ class GradeController extends Controller
             'student_id' => 'required|exists:students,id',
             'subject_id' => 'required|exists:subjects,id',
             'class_id' => 'required|exists:school_classes,id',
-            'type' => 'required|string|max:255',
+            'grade_type_id' => 'nullable|exists:grade_types,id',
+            'academic_years' => 'required|exists:academic_years,id',
             'score' => 'required|numeric|min:0|max:100',
             'remarks' => 'nullable|string',
         ]);
@@ -38,6 +40,9 @@ class GradeController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $type_name = GradeType::where('id', $request->grade_type_id)->first();
+        $type = $type_name ? $type_name->name : null;
+
         $validated = $validator->validated();
 
         $grade = Grade::create([
@@ -45,7 +50,9 @@ class GradeController extends Controller
             'student_id' => $validated['student_id'],
             'subject_id' => $validated['subject_id'],
             'class_id' => $validated['class_id'],
-            'type' => $validated['type'],
+            'grade_type_id' => $validated['grade_type_id'],
+            'academic_year_id' => $validated['academic_years'],
+            'type' => $type,
             'score' => $validated['score'],
             'remarks' => $validated['remarks'],
         ]);
@@ -56,10 +63,10 @@ class GradeController extends Controller
     /**
      * Show the specified grade.
      */
-    public function show($id)
+    public function show($id) 
     {
         $grade = Grade::where('tenant_id', auth()->user()->tenant_id)
-            ->with(['student', 'subject', 'class'])
+            ->with(['student', 'subject', 'class', 'gradeType', 'academicYear'])
             ->find($id);
 
         if (!$grade) {
@@ -82,7 +89,8 @@ class GradeController extends Controller
             'student_id' => 'required|exists:students,id',
             'subject_id' => 'required|exists:subjects,id',
             'class_id' => 'required|exists:school_classes,id',
-            'type' => 'required|string|max:255',
+            'grade_type_id' => 'nullable|exists:grade_types,id',
+            'academic_years' => 'required|exists:academic_years,id',
             'score' => 'required|numeric|min:0|max:100',
             'remarks' => 'nullable|string',
         ]);
@@ -91,9 +99,21 @@ class GradeController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $type_name = GradeType::where('id', $request->grade_type_id)->first();
+        $type = $type_name ? $type_name->name : null;
+
         $validated = $validator->validated();
 
-        $grade->update($validated);
+        $grade->update([
+            'student_id' => $validated['student_id'],
+            'subject_id' => $validated['subject_id'],
+            'class_id' => $validated['class_id'],
+            'grade_type_id' => $validated['grade_type_id'],
+            'academic_year_id' => $validated['academic_years'],
+            'type' => $type,
+            'score' => $validated['score'],
+            'remarks' => $validated['remarks'],
+        ]);
 
         return response()->json($grade);
     }

@@ -13,7 +13,9 @@ class Grade extends Model
         'tenant_id',
         'student_id',
         'subject_id',
+        'grade_type_id',
         'class_id',
+        'academic_year_id',
         'type',
         'score',
         'remarks',
@@ -49,5 +51,16 @@ class Grade extends Model
     public function class()
     {
         return $this->belongsTo(SchoolClass::class);
+    }
+
+    public function gradeType()
+    {
+        return $this->belongsTo(GradeType::class);
+    }
+
+    //relationship to AcademicYear
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 }

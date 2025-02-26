@@ -50,4 +50,10 @@ class SchoolClass extends Model
         return $this->hasMany(Student::class, 'class_id');
     }
 
+    //subject
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'class_subject');
+    }
+
 }

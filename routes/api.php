@@ -20,6 +20,8 @@ use App\Http\Controllers\Teacher\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Parent\AttendancesController;
 use App\Http\Controllers\GradeTypeController;
+use App\Http\Controllers\BillTypeController;
+use App\Http\Controllers\AssignedBillController;
 
 
 Route::post('/chat', [ChatController::class, 'handleHuggingFace']);
@@ -29,6 +31,19 @@ Route::post('/yay', [ChatController::class, 'handleYay']);
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('grade-types', GradeTypeController::class);
 });
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('bill-types', BillTypeController::class);
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('assigned-bills', AssignedBillController::class);
+});
+Route::middleware('auth:api')->group(function () {
+    Route::get('assigned-bills/student/{studentId}', [AssignedBillController::class, 'getStudentBills']);
+});
+
+
 
 
 //parent, prefix attendance

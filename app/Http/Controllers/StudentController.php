@@ -24,16 +24,35 @@ class StudentController extends Controller
     /**
      * Show a specific student by ID.
      */
-    public function show($id)
-    {
-        $student = Student::where('tenant_id', auth()->user()->tenant_id)->with('class', 'user')->find($id);
+    /**
+ * Show a specific student by ID with detailed relationships.
+ */
+/**
+ * Show a specific student by ID with detailed relationships.
+ */
+public function show($id)
+{
+    $student = Student::where('tenant_id', auth()->user()->tenant_id)
+        ->with([
+            'class.academicYear', // Menampilkan academic_year_id dalam class
+            'user',
+            'guardians',
+            'grades.subject',
+            'grades.class', // Tambahkan class_id ke dalam grades
+            'grades.academicYear', // Tambahkan academic_year_id ke dalam grades
+            'bills.billType',
+            'bills.academicYear'
+        ])
+        ->find($id);
 
-        if (!$student) {
-            return response()->json(['error' => 'Student not found'], 404);
-        }
-
-        return response()->json($student);
+    if (!$student) {
+        return response()->json(['error' => 'Student not found'], 404);
     }
+
+    return response()->json($student);
+}
+
+
 
     /**
      * Store a newly created student.

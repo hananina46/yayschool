@@ -39,7 +39,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           tabBarLabelStyle: { fontSize: 12, fontWeight: 'bold', color: '#FF4D6D' }, // Warna teks aktif
         }}
-      />
+      /> 
       <Tabs.Screen
         name="explore"
         options={{
