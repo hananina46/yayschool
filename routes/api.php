@@ -24,13 +24,33 @@ use App\Http\Controllers\BillTypeController;
 use App\Http\Controllers\AssignedBillController;
 use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ExtracurricularNameController;
+use App\Http\Controllers\ExtracurricularMemberController;
+use App\Http\Controllers\ExtracurricularGradeController;
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('/extracurricular-grades/member/{member_id}', [ExtracurricularGradeController::class, 'index']);
+    Route::apiResource('extracurricular-grades', ExtracurricularGradeController::class)->except(['index']);
+});
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('extracurricular-members', ExtracurricularMemberController::class);
+    Route::get('/extracurricular-members/extracurricular/{id}', [ExtracurricularMemberController::class, 'getMembersByExtracurricular']);
+
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('extracurricular-names', ExtracurricularNameController::class);
+});
+
 
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('documents', DocumentController::class);
     //documentsByUser
     Route::get('documents/user/{userId}', [DocumentController::class, 'documentsByUser']);
 });
-
+  
 
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('document-types', DocumentTypeController::class);

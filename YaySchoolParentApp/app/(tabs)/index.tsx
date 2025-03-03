@@ -3,14 +3,29 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, StatusBar } from "
 import Icon from "react-native-vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 export default function HomeScreen() {
   const router = useRouter();
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        router.replace('/login');
+      }
+    };
+  });
+
   const sections = [
     { title: "Absensi", icon: "check-circle", color: "#FF4D6D", route: "/attendance" },
-    { title: "Tasks", icon: "book", color: "#2563EB", route: "/assignments" },
-    { title: "Grades", icon: "graduation-cap", color: "#F59E0B", route: "/grades" },
+    //payment
+    { title: "Billing", icon: "money", color: "#10B981", route: "/payment" },
+    //my student
+    { title: "Students", icon: "user", color: "#2563EB", route: "/mystudent" },
   ];
 
   const newsList = [

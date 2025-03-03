@@ -64,4 +64,10 @@ class Student extends Model
         return $this->hasMany(AssignedBill::class);
     }
 
+    //extracurricular
+    public function extracurriculars()
+    {
+        return $this->hasMany(ExtracurricularMember::class);
+    }
+
 }

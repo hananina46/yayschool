@@ -59,12 +59,26 @@ class AttendancesController extends Controller
             return response()->json(['error' => 'Guardian not found or unauthorized'], 403);
         }
 
-        // Periksa apakah studentId termasuk dalam daftar anak dari guardian
+        // Periksa apakah studentId termasuk dalam daftar anak dari guardian, with class
         $student = $guardian->students->where('id', $studentId)->first();
 
         if (!$student) {
             return response()->json(['error' => 'Unauthorized access to student data'], 403);
         }
+
+        //get student with class, 'class.academicYear','user','guardians','grades.subject','grades.class','grades.academicYear','bills.billType','bills.academicYear'
+        $student = Student::where('id', $studentId)
+            ->with([
+                'class.academicYear',
+                'user',
+                'guardians',
+                'grades.subject',
+                'grades.class',
+                'grades.academicYear',
+                'bills.billType',
+                'bills.academicYear'
+            ])
+            ->first();
 
         return response()->json($student);
     }

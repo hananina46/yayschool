@@ -102,6 +102,14 @@
         ],
       },
       {
+  title: 'Extracurricular',
+  items: [
+    { label: 'Extracurricular List', link: '/school/extracurricular-list', icon: 'trophy' },
+    { label: 'Extracurricular Members', link: '/school/extracurricular-members', icon: 'people' },
+    { label: 'Extracurricular Grades', link: '/school/extracurricular-grades', icon: 'clipboard' },
+  ], 
+},
+      {
         title: 'Supports',
         items: [
           { label: 'Documentation', link: 'https://vristo.sbthemes.com', icon: 'document-text' },

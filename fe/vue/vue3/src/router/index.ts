@@ -172,6 +172,22 @@ const routes: RouteRecordRaw[] = [
         component: () => import(/* webpackChunkName: "document-type" */ '../views/admin/DocumentType.vue'),
         meta: { requiresAuth: true }
     },
+
+    //ExtracurricularList.vue
+    {
+        path: '/school/extracurricular-list',
+        name: 'extracurricular_list',
+        component: () => import(/* webpackChunkName: "extracurricular-list" */ '../views/admin/ExtracurricularList.vue'),
+        meta: { requiresAuth: true }
+    },
+
+    //school/extracurricular-members
+    {
+        path: '/school/extracurricular-members',
+        name: 'extracurricular_members',
+        component: () => import(/* webpackChunkName: "extracurricular-members" */ '../views/admin/ExtracurricularMember.vue'),
+        meta: { requiresAuth: true }
+    },
     
     
     

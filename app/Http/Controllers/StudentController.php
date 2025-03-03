@@ -34,14 +34,15 @@ public function show($id)
 {
     $student = Student::where('tenant_id', auth()->user()->tenant_id)
         ->with([
-            'class.academicYear', // Menampilkan academic_year_id dalam class
+            'class.academicYear', 
             'user',
             'guardians',
             'grades.subject',
-            'grades.class', // Tambahkan class_id ke dalam grades
-            'grades.academicYear', // Tambahkan academic_year_id ke dalam grades
+            'grades.class', 
+            'grades.academicYear', 
             'bills.billType',
-            'bills.academicYear'
+            'bills.academicYear',
+            'extracurriculars.extracurricular',
         ])
         ->find($id);
 
