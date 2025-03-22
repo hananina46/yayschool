@@ -39,7 +39,7 @@ public function show($id)
             'guardians',
             'grades.subject',
             'grades.class', 
-            'grades.academicYear', 
+            'grades.academicYear',  
             'bills.billType',
             'bills.academicYear',
             'extracurriculars.extracurricular',

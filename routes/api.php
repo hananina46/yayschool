@@ -27,6 +27,14 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ExtracurricularNameController;
 use App\Http\Controllers\ExtracurricularMemberController;
 use App\Http\Controllers\ExtracurricularGradeController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\DormitoryController;
+
+Route::apiResource('dormitories', DormitoryController::class);
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('announcements', AnnouncementController::class);
+});
+
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/extracurricular-grades/member/{member_id}', [ExtracurricularGradeController::class, 'index']);

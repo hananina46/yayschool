@@ -70,4 +70,10 @@ class Student extends Model
         return $this->hasMany(ExtracurricularMember::class);
     }
 
+    public function dormitory()
+    {
+        return $this->belongsTo(Dormitory::class, 'dormitory_id');
+    }
+
+
 }
